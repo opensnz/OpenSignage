@@ -75,6 +75,22 @@ def msg_player(request):
         return HttpResponseBadRequest()  # Return HTTP "Bad Request" response
 
 
+def playlist_to_player(request):
+    try:
+        body = json.loads(request.body)
+        playlist = []
+        for media_uuid in body["playlist"]:
+            media = get_object_or_404(Media, uuid=media_uuid)
+            playlist.append(MediaDownloadingSerializer(media).data)
+        channel_layer = get_channel_layer()
+        player = get_object_or_404(Player, uuid=body["player"])
+        async_to_sync(channel_layer.send)(str(player.channel),
+                                          {"type": "player.playlist", "playlist": playlist})
+        return HttpResponse(status=200)
+    except:
+        return HttpResponseBadRequest()  # Return HTTP "Bad Request" response
+
+
 def image_to_player(request):
     try:
         body = json.loads(request.body)
