@@ -36,6 +36,8 @@ class PlayerConsumer(JsonWebsocketConsumer):
         uuid = self.scope['url_route']['kwargs']['uuid']
         if content["type"] == "screenshot":
             handle_player_screenshot(player_uuid=uuid, content=content)
+        if content["type"] == "form":
+            handle_player_form(player_uuid=uuid, content=content)
 
     def player_message(self, event):
         print("PlayerMessage :", event["message"])
